@@ -1,0 +1,9 @@
+*.bak
+.DS_Store
+/better-bibtex
+/locate
+/styles
+/tmp
+/translators
+better-bibtex.sqlite-journal
+zotero.sqlite-journal
