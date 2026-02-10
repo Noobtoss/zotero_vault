@@ -1,0 +1,79 @@
+A Shallow Blog about Deep Learning
+	
+Yani Ioannou
+
+PhD student, Machine Intelligence Lab @ University of Cambridge
+
+	Follow
+A Tutorial on Filter Groups (Grouped Convolution)
+
+Filter groups (AKA grouped convolution) were introduced in the now seminal AlexNet paper in 2012. As explained by the authors, their primary motivation was to allow the training of the network over two Nvidia GTX 580 gpus with 1.5GB of memory each. With the model requiring just under 3GB of GPU RAM to train, filter groups allowed more efficient model-parellization across the GPUs, as shown in the illustration of the network from the paper:
+
+The architecture of AlexNet as illustrated in the original paper, showing two separate convolutional filter groups across most of the layers (Alex Krizhevsky et al. 2012).
+
+The vast majority of deep learning researchers had explained away filter groups as an engineering hack, until the initial publication of the Deep Roots paper in May 2016. Indeed it was clear that this was the primary reason for their invention, and by removing parameters surely accuracy was decreased?
+
+Not just an Engineering Hack!
+AlexNet conv1 filter separation: as noted by the authors, filter groups appear to structure learned filters into two distinct groups, black-and-white and colour filters (Alex Krizhevsky et al. 2012).
+
+However, even the AlexNet authors noted, back in 2012, that there was an interesting side-effect to this engineering hack - the conv1 filters being easily interpreted, it was noted that filter groups seemed to consistently divide conv1 into two separate and distinct tasks: black and white filters and colour filters.
+
+AlexNet trained with varying numbers of filter groups, from 1 (i.e. no filter groups), to 4. When trained with 2 filter groups, AlexNet is more efficient and yet achieves the same if not lower validation error.
+
+What wasn’t noted explicitly in the AlexNet paper was the more important side-effect of convolutional groups, that they learn better representations. This seems like quite the extraordinary claim, however this is backed up by one simple experiment: train AlexNet with and without filter groups and observe the difference in accuracy/computational efficiency. This is illustrated in the graph above, and as can be seen, not only is AlexNet without filter groups less efficient (both in parameters and compute), but it is also slightly less accurate!
+
+How do Filter Groups Work?
+A normal convolutional layer. Yellow blocks represent learned parameters, gray blocks represent feature maps/input images (working memory).
+
+Above is shown a normal convolutional layer, with no filter groups. Unlike most illustrations of CNNs, including that of AlexNet, here we explicitly show the channel dimension. This is the third dimension of a convolutional feature map, where the output of each filter is represented by one channel. In illustrations like this it is clear that the spatial dimension of a featuremap is often the tip of the iceberg, as we get deeper in a CNN, the number of channels rapidly increases (with the increase in the number of filters), while the spatial dimensions decrease (with pooling/strided convolution). Thus in much of the network, the channel dimension will dominate.
+
+A convolutional layer with 2 filter groups. Note that each of the filters in the grouped convolutional layer is now exactly half the depth, i.e. half the parameters and half the compute as the original filter.
+
+Above is illustrated a convolutional layer with 2 filter groups, where each the filters in each filter group are convolved with only half the previous layer’s featuremaps. Unlike in the AlexNet illustration, with the third dimension shown it is immediately obvious that the grouped convolutional filters are much smaller than their normal counterparts. With two filter groups, as used in most of AlexNet, each filter is exactly half the number of parameters (yellow) of the equivalent normal convolutional layer.
+
+Why do Filter Groups Work?
+
+This is where it gets a big more complicated. It’s not immediately obvious that filter groups should be of any benefit, but they are often able to learn more efficient and better representations. This is because filter relationships are sparse.
+
+The correlation matrix between filters of adjacent layers in a Network-in-Network model trained on CIFAR10. Pairs of highly correlated filters are brighter, while lower correlated filters are darker.
+
+We can show this by looking at the correlation across filters of adjacent layers. As shown above, the correlations are generally quite low, although in a standard network there is no discernable ordering of these filter relationships, they are also different between models trained with different random initializations. What about with filter groups?
+
+The correlations between filters of adjacent layers in a Network-in-Network model trained on CIFAR10, when trained with 1, 2, 4, 8 and 16 filter groups.
+
+The effect of filter groups is to learn with a block-diagonal structured sparsity on the channel dimension. As can be seen in the correlation images, the filters with high correlation are learned in a more structured way in the networks with filter groups. In effect, filter relationships that don’t have to be learned are no longer parameterized. In reducing the number of parameters in the network in this salient way, it is not as easy to over-fit, and hence a regularization-like effect allows the optimizer to learn more accurate, more efficient deep networks.
+
+Unanswered Questions
+
+How do we decide the number of filter groups to use? Can filter groups overlap? Do all groups have to be the same size, what about heterogeneous filter groups?
+
+Unfortunately for the moment these are questions yet to be fully answered, although the latter has recently received some attention from Tae Lee et al., at KAIST.
+
+ Categories:convolution deep filter grouped groups learning tutorial
+
+ Updated: August 10, 2017
+
+SHARE ON
+Twitter
+Facebook
+Google+
+LinkedIn
+Previous
+Next
+LEAVE A COMMENT
+
+Your email address will not be published. Required fields are marked *
+
+Comment *
+Markdown is supported.
+Name *
+Email address *
+Website (optional)
+Submit Comment
+YOU MAY ALSO ENJOY
+Pushing the Exoplanet Frontier with Deep Learning
+Learning with Backpropagation
+Backpropagation Derivation - Multi-layer Neural Networks
+Backpropagation Derivation - Delta Rule
+FOLLOW: TWITTER GITHUB FEED
+© 2020 Yani Ioannou. Powered by Jekyll & Minimal Mistakes.
